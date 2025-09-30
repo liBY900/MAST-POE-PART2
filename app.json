@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "Trail2",
+    "name": "BigOne Kitchen",
     "slug": "Trail2",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/launch.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
