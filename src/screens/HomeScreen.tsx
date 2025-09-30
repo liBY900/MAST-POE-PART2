@@ -6,17 +6,18 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList, MenuItemType, NewItemType, FiltersType } from '../navigation/types';
 
 
-// --- Type Definitions for Navigation ---
+
 type HomeRouteProp = RouteProp<RootStackParamList, 'Home'>;
 type HomeNavProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
 
-// --- Initial Menu Data ---
-// NOTE: These images must exist in your 'assets' folder
+
 const initialMenuItems: MenuItemType[] = [
   { id: '1', name: 'Grilled Salmon', description: 'With lemon and herbs', price: 'R250', image: require('../../assets/salmon.jpeg'), vegetarian: false, vegan: false },
   { id: '2', name: 'Mushroom Risotto', description: 'Creamy risotto with wild mushrooms', price: 'R180', image: require('../../assets/risotto.jpeg'), vegetarian: true, vegan: true },
   { id: '3', name: 'Chocolate Lava Cake', description: 'Warm cake with a molten center', price: 'R95', image: require('../../assets/lava-cake.jpeg'), vegetarian: true, vegan: false },
   { id: '4', name: 'Lobster and Pasta', description: 'Fresh Atlantic lobster with linguine in a rich butter-garlic sauce', price: 'R450', image: require('../../assets/lobster-pasta.jpeg'), vegetarian: false, vegan: false },
+  { id: '5', name: 'Coconut Rice Bowls', description: 'Fluffy coconut rice topped with pan-seared tofu and fresh vegetables', price: 'R160', image: require('../../assets/coconut-rice-bowls.jpeg'), vegetarian: true, vegan: true },
+  { id: '6', name: 'Veg Pizza', description: 'Classic stone-baked pizza topped with fresh seasonal vegetables and mozzarella.', price: 'R250', image: require('../../assets/Veg Pizza.jpeg'), vegetarian: true,vegan: false}
 ];
 
 const HomeScreen: React.FC = () => {
@@ -28,7 +29,7 @@ const HomeScreen: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentFilters, setCurrentFilters] = useState<FiltersType | null>(null);
 
-  // 1. Handle new item addition from AddItemScreen
+  
   useEffect(() => {
     if (route.params?.newItem) {
       const newItem: MenuItemType = { 
