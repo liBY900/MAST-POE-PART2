@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
   },
   buttonText: { color: '#fff', fontSize: 30, lineHeight: 30 },
   filterButton: { 
-    backgroundColor: '#333', 
+    backgroundColor: '#8800C7', 
     paddingHorizontal: 15, 
     paddingVertical: 10, 
     borderRadius: 25, 
@@ -191,6 +191,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   filterButtonText: { color: '#fff', fontWeight: 'bold' },
+  
 });
 
 export default HomeScreen;
