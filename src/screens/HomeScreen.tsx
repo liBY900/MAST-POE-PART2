@@ -16,7 +16,7 @@ const initialMenuItems: MenuItemType[] = [
   { id: '2', name: 'Mushroom Risotto', description: 'Creamy risotto with wild mushrooms', price: 'R180', image: require('../../assets/risotto.jpeg'), vegetarian: true, vegan: true },
   { id: '3', name: 'Chocolate Lava Cake', description: 'Warm cake with a molten center', price: 'R95', image: require('../../assets/lava-cake.jpeg'), vegetarian: true, vegan: false },
   { id: '4', name: 'Lobster and Pasta', description: 'Fresh Atlantic lobster with linguine in a rich butter-garlic sauce', price: 'R450', image: require('../../assets/lobster-pasta.jpeg'), vegetarian: false, vegan: false },
-  { id: '5', name: 'Coconut Rice Bowls', description: 'Fluffy coconut rice topped with pan-seared tofu and fresh vegetables', price: 'R160', image: require('../../assets/coconut-rice-bowls.jpeg'), vegetarian: true, vegan: true },
+  { id: '5', name: 'Coconut Rice Bowls', description: 'Fluffy coconut rice topped with pan-seared tofu and fresh vegetables', price: 'R160', image: require('../../assets/Coconut Rice Bowls.jpeg'), vegetarian: true, vegan: true },
   { id: '6', name: 'Veg Pizza', description: 'Classic stone-baked pizza topped with fresh seasonal vegetables and mozzarella.', price: 'R250', image: require('../../assets/Veg Pizza.jpeg'), vegetarian: true,vegan: false}
 ];
 
