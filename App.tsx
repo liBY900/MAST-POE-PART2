@@ -1,13 +1,11 @@
-// App.tsx
 import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-// Screen Imports
 import HomeScreen from './src/screens/HomeScreen';
 import AddItemScreen from './src/screens/AddItemScreen';
 import FilterScreen from './src/screens/FilterScreen';
-// Type Import
+
 import type { RootStackParamList } from './src/navigation/types.ts';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();

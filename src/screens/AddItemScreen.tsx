@@ -23,7 +23,7 @@ const AddItemScreen: React.FC = () => {
       return;
     }
     
-    // Validate price is a number
+    // Validating price is a number
     const numericPrice = parseInt(price, 10);
     if (isNaN(numericPrice) || numericPrice <= 0) {
       Alert.alert('Invalid Price', 'Price must be a valid number greater than zero.');
@@ -38,7 +38,7 @@ const AddItemScreen: React.FC = () => {
       vegan: isVegan,
     };
 
-    // Navigate back to Home and pass the new item via route params
+    // Navigating back to Home and pass the new item via route params
     navigation.navigate('Home', { newItem });
 
     // Reset fields

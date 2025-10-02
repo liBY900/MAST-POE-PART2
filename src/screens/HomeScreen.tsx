@@ -42,11 +42,11 @@ const HomeScreen: React.FC = () => {
     }
   }, [route.params?.newItem]);
 
-  // 2. Handle filtering and searching
+  //  Handling filtering and searching
   useEffect(() => {
     let items = [...menuItems];
 
-    // Apply search filter
+    // Applying search filter
     if (searchTerm) {
         const term = searchTerm.toLowerCase();
         items = items.filter(i => 
@@ -55,7 +55,7 @@ const HomeScreen: React.FC = () => {
         );
     }
     
-    // Apply navigation filters
+    // Applying navigation filters
     const filters = route.params?.filters || currentFilters;
     if (filters) {
       setCurrentFilters(filters);
@@ -73,7 +73,6 @@ const HomeScreen: React.FC = () => {
     setFilteredItems(items);
   }, [route.params?.filters, menuItems, searchTerm]);
 
-  // --- Render Functions ---
   const renderItem = ({ item }: { item: MenuItemType }) => (
     <View style={styles.menuItem}>
       {item.image && <Image source={item.image} style={styles.menuImage} />}
@@ -118,7 +117,7 @@ const HomeScreen: React.FC = () => {
             <Text style={styles.filterButtonText}>Filter</Text>
           </TouchableOpacity>
           
-          {/* Add Item Button */}
+          {/* Adding Item Button */}
           <TouchableOpacity 
             style={styles.floatingButton} 
             onPress={() => navigation.navigate('AddItem')}
@@ -151,8 +150,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff', 
     borderRadius: 10, 
     padding: 10,
-    elevation: 3, // Shadow for Android
-    shadowColor: '#000', // Shadow for iOS
+    elevation: 3,
+    shadowColor: '#000', 
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 2,

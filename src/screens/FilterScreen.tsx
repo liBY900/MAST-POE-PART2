@@ -1,4 +1,4 @@
-// src/screens/FilterScreen.tsx
+
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Switch, Button, ScrollView, SafeAreaView } from 'react-native';
 import Slider from '@react-native-community/slider'; // Requires installing '@react-native-community/slider'
@@ -13,7 +13,7 @@ const FilterScreen: React.FC = () => {
   const navigation = useNavigation<FilterNavProp>();
   const route = useRoute<FilterRouteProp>();
   
-  // Initialize state with current filters passed from Home Screen, or defaults
+  // Initializing state with current filters passed from Home Screen, or defaults
   const initialFilters = route.params?.currentFilters || { isVegetarian: false, isVegan: false, priceRange: 500 };
   
   const [isVegetarian, setIsVegetarian] = useState(initialFilters.isVegetarian);
@@ -27,12 +27,12 @@ const FilterScreen: React.FC = () => {
       priceRange 
     };
     
-    // Navigate back to Home and pass the filters
+    // Navigating back to Home and pass the filters
     navigation.navigate('Home', { filters });
   };
   
   const handleClearFilters = () => {
-      // Navigate back to Home with undefined filters to clear them
+      // Navigating back to Home with undefined filters to clear them
       navigation.navigate('Home', { filters: undefined });
   };
 
