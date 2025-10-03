@@ -17,7 +17,7 @@ const initialMenuItems: MenuItemType[] = [
   { id: '3', name: 'Chocolate Lava Cake', description: 'Warm cake with a molten center', price: 'R95', image: require('../../assets/lava-cake.jpeg'), vegetarian: true, vegan: false },
   { id: '4', name: 'Lobster and Pasta', description: 'Fresh Atlantic lobster with linguine in a rich butter-garlic sauce', price: 'R450', image: require('../../assets/lobster-pasta.jpeg'), vegetarian: false, vegan: false },
   { id: '5', name: 'Coconut Rice Bowls', description: 'Fluffy coconut rice topped with pan-seared tofu and fresh vegetables', price: 'R160', image: require('../../assets/Coconut Rice Bowls.jpeg'), vegetarian: true, vegan: true },
-  { id: '6', name: 'Veg Pizza', description: 'Classic stone-baked pizza topped with fresh seasonal vegetables and mozzarella.', price: 'R250', image: require('../../assets/Veg Pizza.jpeg'), vegetarian: true,vegan: false}
+  { id: '6', name: 'Veg Pizza', description: 'Classic stone-baked pizza topped with fresh seasonal vegetables and mozzarella.', price: 'R250', image: require('../../assets/Veg Pizza.jpeg'), vegetarian: true, vegan: false }
 ];
 
 const HomeScreen: React.FC = () => {
@@ -29,14 +29,14 @@ const HomeScreen: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentFilters, setCurrentFilters] = useState<FiltersType | null>(null);
 
-  
+
   useEffect(() => {
     if (route.params?.newItem) {
-      const newItem: MenuItemType = { 
-        ...route.params.newItem, 
-        id: Date.now().toString(), 
+      const newItem: MenuItemType = {
+        ...route.params.newItem,
+        id: Date.now().toString(),
         // Placeholder image for user-added items
-        image: require('../../assets/placeholder.jpeg') 
+        image: require('../../assets/placeholder.jpeg')
       };
       setMenuItems(prev => [newItem, ...prev]);
     }
@@ -48,22 +48,22 @@ const HomeScreen: React.FC = () => {
 
     // Applying search filter
     if (searchTerm) {
-        const term = searchTerm.toLowerCase();
-        items = items.filter(i => 
-            i.name.toLowerCase().includes(term) || 
-            i.description.toLowerCase().includes(term)
-        );
+      const term = searchTerm.toLowerCase();
+      items = items.filter(i =>
+        i.name.toLowerCase().includes(term) ||
+        i.description.toLowerCase().includes(term)
+      );
     }
-    
+
     // Applying navigation filters
     const filters = route.params?.filters || currentFilters;
     if (filters) {
       setCurrentFilters(filters);
       const { isVegetarian, isVegan, priceRange } = filters;
-      
+
       if (isVegetarian) items = items.filter(i => i.vegetarian);
       if (isVegan) items = items.filter(i => i.vegan);
-      
+
       items = items.filter(i => {
         const numericPrice = parseInt(String(i.price).replace('R', ''), 10) || 0;
         return numericPrice <= priceRange;
@@ -97,7 +97,7 @@ const HomeScreen: React.FC = () => {
           value={searchTerm}
           onChangeText={setSearchTerm}
         />
-        
+
         <FlatList
           data={filteredItems}
           renderItem={renderItem}
@@ -106,20 +106,20 @@ const HomeScreen: React.FC = () => {
             <Text style={styles.emptyText}>No items found matching your criteria.</Text>
           )}
         />
-        
+
         {/* Fixed Footer/Button Container */}
         <View style={styles.buttonContainer}>
           {/* Filter Button */}
-          <TouchableOpacity 
-            style={styles.filterButton} 
-            onPress={() => navigation.navigate('Filter', { currentFilters: currentFilters || { isVegetarian: false, isVegan: false, priceRange: 500 }as FiltersType })}
+          <TouchableOpacity
+            style={styles.filterButton}
+            onPress={() => navigation.navigate('Filter', { currentFilters: currentFilters || { isVegetarian: false, isVegan: false, priceRange: 500 } as FiltersType })}
           >
             <Text style={styles.filterButtonText}>Filter</Text>
           </TouchableOpacity>
-          
+
           {/* Adding Item Button */}
-          <TouchableOpacity 
-            style={styles.floatingButton} 
+          <TouchableOpacity
+            style={styles.floatingButton}
             onPress={() => navigation.navigate('AddItem')}
           >
             <Text style={styles.buttonText}>+</Text>
@@ -143,15 +143,15 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     backgroundColor: '#f5f5f5',
   },
-  menuItem: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    marginBottom: 15, 
-    backgroundColor: '#fff', 
-    borderRadius: 10, 
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+    backgroundColor: '#fff',
+    borderRadius: 10,
     padding: 10,
     elevation: 3,
-    shadowColor: '#000', 
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
@@ -164,34 +164,34 @@ const styles = StyleSheet.create({
   tagContainer: { flexDirection: 'row', marginTop: 5 },
   tag: { fontSize: 12, color: '#fff', backgroundColor: '#00C788', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 10, marginRight: 5 },
   emptyText: { textAlign: 'center', marginTop: 50, fontSize: 16, color: '#888' },
-  
+
   // Floating Buttons
-  buttonContainer: { 
-    position: 'absolute', 
-    bottom: 25, 
-    right: 25, 
+  buttonContainer: {
+    position: 'absolute',
+    bottom: 25,
+    right: 25,
     alignItems: 'flex-end',
   },
-  floatingButton: { 
-    backgroundColor: '#8800C7', 
-    width: 60, 
-    height: 60, 
-    borderRadius: 30, 
-    justifyContent: 'center', 
-    alignItems: 'center', 
+  floatingButton: {
+    backgroundColor: '#8800C7',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
     elevation: 6,
   },
   buttonText: { color: '#fff', fontSize: 30, lineHeight: 30 },
-  filterButton: { 
-    backgroundColor: '#8800C7', 
-    paddingHorizontal: 15, 
-    paddingVertical: 10, 
-    borderRadius: 25, 
+  filterButton: {
+    backgroundColor: '#8800C7',
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderRadius: 25,
     marginBottom: 10,
     elevation: 4,
   },
   filterButtonText: { color: '#fff', fontWeight: 'bold' },
-  
+
 });
 
 export default HomeScreen;

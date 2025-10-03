@@ -12,42 +12,42 @@ type FilterRouteProp = RouteProp<RootStackParamList, 'Filter'>;
 const FilterScreen: React.FC = () => {
   const navigation = useNavigation<FilterNavProp>();
   const route = useRoute<FilterRouteProp>();
-  
+
   // Initializing state with current filters passed from Home Screen, or defaults
   const initialFilters = route.params?.currentFilters || { isVegetarian: false, isVegan: false, priceRange: 500 };
-  
+
   const [isVegetarian, setIsVegetarian] = useState(initialFilters.isVegetarian);
   const [isVegan, setIsVegan] = useState(initialFilters.isVegan);
   const [priceRange, setPriceRange] = useState(initialFilters.priceRange);
 
   const handleApplyFilters = () => {
-    const filters: FiltersType = { 
-      isVegetarian, 
-      isVegan, 
-      priceRange 
+    const filters: FiltersType = {
+      isVegetarian,
+      isVegan,
+      priceRange
     };
-    
+
     // Navigating back to Home and pass the filters
     navigation.navigate('Home', { filters });
   };
-  
+
   const handleClearFilters = () => {
-      // Navigating back to Home with undefined filters to clear them
-      navigation.navigate('Home', { filters: undefined });
+    // Navigating back to Home with undefined filters to clear them
+    navigation.navigate('Home', { filters: undefined });
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container}>
-        
+
         {/* Dietary Filters */}
         <Text style={styles.header}>Dietary Requirements</Text>
-        
+
         <View style={styles.filterOption}>
           <Text style={styles.filterLabel}>Vegetarian</Text>
-          <Switch 
-            value={isVegetarian} 
-            onValueChange={setIsVegetarian} 
+          <Switch
+            value={isVegetarian}
+            onValueChange={setIsVegetarian}
             trackColor={{ false: '#767577', true: '#00C788' }}
             thumbColor={isVegetarian ? '#fff' : '#f4f3f4'}
           />
@@ -55,9 +55,9 @@ const FilterScreen: React.FC = () => {
 
         <View style={styles.filterOption}>
           <Text style={styles.filterLabel}>Vegan</Text>
-          <Switch 
-            value={isVegan} 
-            onValueChange={setIsVegan} 
+          <Switch
+            value={isVegan}
+            onValueChange={setIsVegan}
             trackColor={{ false: '#767577', true: '#00C788' }}
             thumbColor={isVegan ? '#fff' : '#f4f3f4'}
             disabled={!isVegetarian} // Must be vegetarian to be vegan
@@ -79,19 +79,19 @@ const FilterScreen: React.FC = () => {
         />
 
         <View style={styles.buttonGroup}>
-          <Button 
-            title="Clear Filters" 
-            onPress={handleClearFilters} 
-            color="#C70000" 
+          <Button
+            title="Clear Filters"
+            onPress={handleClearFilters}
+            color="#C70000"
           />
           <View style={{ width: 10 }} />
-          <Button 
-            title="Apply Filters" 
-            onPress={handleApplyFilters} 
-            color="#8800C7" 
+          <Button
+            title="Apply Filters"
+            onPress={handleApplyFilters}
+            color="#8800C7"
           />
         </View>
-        
+
       </ScrollView>
     </SafeAreaView>
   );
@@ -102,10 +102,10 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#fff' },
   container: { flex: 1, padding: 20 },
   header: { fontSize: 20, fontWeight: 'bold', color: '#333', marginTop: 15, marginBottom: 15, borderBottomWidth: 1, borderBottomColor: '#eee', paddingBottom: 5 },
-  filterOption: { 
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
-    alignItems: 'center', 
+  filterOption: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 15,
   },
   filterLabel: { fontSize: 16, color: '#444' },

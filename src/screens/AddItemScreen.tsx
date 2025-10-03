@@ -13,7 +13,7 @@ const AddItemScreen: React.FC = () => {
   const [price, setPrice] = useState('');
   const [isVegetarian, setIsVegetarian] = useState(false);
   const [isVegan, setIsVegan] = useState(false);
-  
+
   const navigation = useNavigation<AddItemNavProp>();
 
   const handleSave = () => {
@@ -22,7 +22,7 @@ const AddItemScreen: React.FC = () => {
       Alert.alert('Missing Info', 'Please fill in the name, description, and price.');
       return;
     }
-    
+
     // Validating price is a number
     const numericPrice = parseInt(price, 10);
     if (isNaN(numericPrice) || numericPrice <= 0) {
@@ -81,9 +81,9 @@ const AddItemScreen: React.FC = () => {
 
         <View style={styles.switchRow}>
           <Text style={styles.label}>Vegetarian</Text>
-          <Switch 
-            value={isVegetarian} 
-            onValueChange={setIsVegetarian} 
+          <Switch
+            value={isVegetarian}
+            onValueChange={setIsVegetarian}
             trackColor={{ false: '#767577', true: '#00C788' }}
             thumbColor={isVegetarian ? '#fff' : '#f4f3f4'}
           />
@@ -91,9 +91,9 @@ const AddItemScreen: React.FC = () => {
 
         <View style={styles.switchRow}>
           <Text style={styles.label}>Vegan</Text>
-          <Switch 
-            value={isVegan} 
-            onValueChange={setIsVegan} 
+          <Switch
+            value={isVegan}
+            onValueChange={setIsVegan}
             trackColor={{ false: '#767577', true: '#00C788' }}
             thumbColor={isVegan ? '#fff' : '#f4f3f4'}
             disabled={!isVegetarian} // A vegan dish must also be vegetarian
@@ -101,7 +101,7 @@ const AddItemScreen: React.FC = () => {
         </View>
 
         <View style={styles.spacer} />
-        
+
         <Button
           title="Save Menu Item"
           onPress={handleSave}
@@ -118,13 +118,13 @@ const styles = StyleSheet.create({
   container: { flex: 1, padding: 20 },
   contentContainer: { paddingBottom: 50 },
   label: { fontSize: 16, marginBottom: 5, fontWeight: 'bold', color: '#333' },
-  input: { 
-    borderWidth: 1, 
-    borderColor: '#ccc', 
-    borderRadius: 8, 
-    padding: 12, 
-    marginBottom: 15, 
-    fontSize: 16 
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 15,
+    fontSize: 16
   },
   descriptionInput: { minHeight: 100, },
   switchRow: {
