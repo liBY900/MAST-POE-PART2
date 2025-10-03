@@ -25,7 +25,7 @@ export default function App() {
         <Stack.Screen 
           name="Home" 
           component={HomeScreen} 
-          options={{ title: "BigOne Kitchen" }} 
+          options={{ title: "Christoffel's Kitchen" }} 
         />
         <Stack.Screen 
           name="AddItem" 
