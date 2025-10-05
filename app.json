@@ -4,7 +4,7 @@
     "slug": "Trail2",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/launch.png",
+    "icon": "./assets/launch2.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
