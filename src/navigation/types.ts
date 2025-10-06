@@ -1,4 +1,5 @@
 // src/navigation/types.ts
+
 export type CourseType = 'Starter' | 'Main Course' | 'Dessert';
 
 export type NewItemType = {
@@ -29,8 +30,18 @@ export type FiltersType = {
 export type RootStackParamList = {
   Home: { 
     newItem?: NewItemType; 
-    filters?: FiltersType;
-  } | undefined;
+    filters?: FiltersType | undefined;
+    
+    // ✅ FIX 1: Add parameter to accept the course filter state from FilterScreen
+    selectedCourse?: CourseType | null | undefined; 
+  } | undefined; // Keep the whole route optional if needed, but parameter is now defined.
+  
   AddItem: undefined;
-  Filter: { currentFilters?: FiltersType } | undefined;
+  
+  Filter: { 
+    currentFilters?: FiltersType;
+    
+    // ✅ FIX 2: Add parameter to pass the current course filter state TO FilterScreen
+    currentCourse?: CourseType | null;
+  } | undefined;
 };

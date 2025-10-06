@@ -1,7 +1,7 @@
-// src/screens/HomeScreen.tsx
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, Image, TouchableOpacity, TextInput, SafeAreaView } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'; 
 import type { RootStackParamList, MenuItemType, NewItemType, FiltersType, CourseType } from '../navigation/types';
 
 export const COURSES: CourseType[] = ['Starter', 'Main Course', 'Dessert'];
@@ -26,8 +26,8 @@ const HomeScreen: React.FC = () => {
   const [filteredItems, setFilteredItems] = useState<MenuItemType[]>(initialMenuItems);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentFilters, setCurrentFilters] = useState<FiltersType | null>(null);
-  // State for selected course filter
-  const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
+  // State for selected course filter 
+  const [selectedCourse, setSelectedCourse] = useState<CourseType | null>(null);
 
 
   useEffect(() => {
@@ -43,7 +43,7 @@ const HomeScreen: React.FC = () => {
       };
 
       setMenuItems(prev => [newItem, ...prev]);
-      // Clear the newItem param after processing it
+      // Clearing the newItem param after processing it
       navigation.setParams({ newItem: undefined });
     }
   }, [route.params?.newItem, navigation]);
@@ -61,19 +61,26 @@ const HomeScreen: React.FC = () => {
       );
     }
 
-    // 2. Applying navigation filters (Vegetarian/Vegan/Price)
+    // --- START FILTER SCREEN LOGIC ---
+
+    // Handling incoming dietary/price filters from FilterScreen
     let filters = route.params?.filters || currentFilters;
 
-    if (route.params?.filters) {
-      setCurrentFilters(route.params.filters);
+    // Checking if new filters arrived from the FilterScreen
+    if (route.params?.filters !== undefined) {
+      setCurrentFilters(route.params.filters || null); 
+      filters = route.params.filters; 
       navigation.setParams({ filters: undefined });
-    } else if (route.params?.filters === undefined) {
-      // If filters are cleared from FilterScreen
-      setCurrentFilters(null);
-      filters = null; // Ensure filters is null for the filtering logic below
-      navigation.setParams({ filters: undefined });
+    } 
+    
+    //  Handling incoming Course filter from FilterScreen
+    if (route.params?.selectedCourse !== undefined) {
+        setSelectedCourse(route.params.selectedCourse);
+        navigation.setParams({ selectedCourse: undefined });
     }
 
+
+    //  Applying navigation filters (Vegetarian/Vegan/Price)
     if (filters) {
       const { isVegetarian, isVegan, priceRange } = filters;
 
@@ -86,17 +93,25 @@ const HomeScreen: React.FC = () => {
       });
     }
 
-    // 3. Applying Course Filter
+    //  Applying Course Filter
     if (selectedCourse) {
-      
       items = items.filter(i => i.course === selectedCourse);
     }
+    
+    // --- END FILTER SCREEN LOGIC ---
 
 
     setFilteredItems(items);
-  }, [route.params?.filters, menuItems, searchTerm, selectedCourse, currentFilters, navigation]);
+  }, [
+    route.params?.filters, 
+    route.params?.selectedCourse,
+    menuItems, 
+    searchTerm, 
+    selectedCourse,
+    currentFilters, 
+    navigation
+  ]);
 
-  // Function to toggle course filter
   const handleCourseFilter = (course: string) => {
     setSelectedCourse(prev => (prev === course ? null : course));
   };
@@ -170,7 +185,7 @@ const HomeScreen: React.FC = () => {
           ListEmptyComponent={() => (
             <Text style={styles.emptyText}>No items found matching your criteria.</Text>
           )}
-          style={{ flex: 1 }} // Ensure FlatList takes up remaining space
+          style={{ flex: 1 }} 
         />
 
         {/* Fixed Footer/Button Container */}
@@ -178,7 +193,10 @@ const HomeScreen: React.FC = () => {
           {/* Filter Button */}
           <TouchableOpacity
             style={styles.filterButton}
-            onPress={() => navigation.navigate('Filter', { currentFilters: currentFilters || { isVegetarian: false, isVegan: false, priceRange: 500 } as FiltersType })}
+            onPress={() => navigation.navigate('Filter', { 
+                currentFilters: currentFilters || { isVegetarian: false, isVegan: false, priceRange: 500 } as FiltersType,
+                currentCourse: selectedCourse 
+            })}
           >
             <Text style={styles.filterButtonText}>Filter</Text>
           </TouchableOpacity>
@@ -196,7 +214,7 @@ const HomeScreen: React.FC = () => {
   );
 };
 
-// --- Styles ---
+// --- Styles (Unchanged) ---
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#fff' },
   container: { flex: 1, paddingHorizontal: 15, paddingVertical: 5 },
@@ -245,7 +263,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 5,
   },
-  // END NEW STYLES
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -267,7 +284,6 @@ const styles = StyleSheet.create({
   tagContainer: { flexDirection: 'row', marginTop: 5 },
   dietTag: { fontSize: 12, color: '#fff', backgroundColor: '#00C788', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 10, marginRight: 5 },
   emptyText: { textAlign: 'center', marginTop: 50, fontSize: 16, color: '#888' },
-  // Floating Buttons
   buttonContainer: {
     position: 'absolute',
     bottom: 25,

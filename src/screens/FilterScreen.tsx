@@ -1,4 +1,3 @@
-// src/screens/FilterScreen.tsx
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Switch, Button, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
 import Slider from '@react-native-community/slider';
@@ -6,7 +5,7 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList, FiltersType, CourseType } from '../navigation/types.ts';
 
-// Define the available course categories - UPDATED to remove 'Drink' and 'Side'
+
 const COURSES: CourseType[] = ['Starter', 'Main Course', 'Dessert'];
 
 type FilterNavProp = NativeStackNavigationProp<RootStackParamList, 'Filter'>;
@@ -16,12 +15,17 @@ type FilterRouteProp = RouteProp<RootStackParamList, 'Filter'>;
 const FilterScreen: React.FC = () => {
   const navigation = useNavigation<FilterNavProp>();
   const route = useRoute<FilterRouteProp>();
+  
+  // Getting initial dietary/price filters
   const initialFilters = route.params?.currentFilters || { isVegetarian: false, isVegan: false, priceRange: 500 };
+  
+  // Getting initial course filter state from HomeScreen
+  const initialCourse = route.params?.currentCourse || null;
 
   const [isVegetarian, setIsVegetarian] = useState(initialFilters.isVegetarian);
   const [isVegan, setIsVegan] = useState(initialFilters.isVegan);
   const [priceRange, setPriceRange] = useState(initialFilters.priceRange);
-  const [selectedCourse, setSelectedCourse] = useState<CourseType | null>(null); 
+  const [selectedCourse, setSelectedCourse] = useState<CourseType | null>(initialCourse); 
   
   const toggleCourseFilter = (course: CourseType) => {
     setSelectedCourse(prev => (prev === course ? null : course));
@@ -34,16 +38,14 @@ const FilterScreen: React.FC = () => {
       isVegan,
       priceRange,
     };
-
-    // Navigating back to Home and pass the filters
-    // For this pattern, we only pass price and dietary filters back:
-    navigation.navigate('Home', { filters }); 
+selectedCourse
+    // Navigating back to Home and pass BOTH the filters object AND the 
+    navigation.navigate('Home', { filters, selectedCourse }); 
   };
 
   const handleClearFilters = () => {
-    // Navigating back to Home with undefined filters to clear them
-    navigation.navigate('Home', { filters: undefined });
-    setSelectedCourse(null); // Clear local course filter state
+    // Navigating back to Home with undefined filters to clear dietary/price
+    navigation.navigate('Home', { filters: undefined, selectedCourse: null });
   };
 
   return (
@@ -129,7 +131,7 @@ const FilterScreen: React.FC = () => {
   );
 };
 
-// --- Styles ---
+// --- Styles  ---
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#fff' },
   container: { flex: 1, padding: 20 },
