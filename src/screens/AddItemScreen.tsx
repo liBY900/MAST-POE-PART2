@@ -1,9 +1,15 @@
 // src/screens/AddItemScreen.tsx
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, SafeAreaView, Switch } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, SafeAreaView, Switch,TouchableOpacity, Image,} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList, NewItemType } from '../navigation/types.ts';
+import type { RootStackParamList, NewItemType, CourseType } from '../navigation/types.ts';
+
+
+const COURSES: CourseType[] = ['Starter', 'Main Course', 'Dessert', 'Drink', 'Side'];
+import * as ImagePicker from 'react-native-image-picker'; 
+
+
 
 type AddItemNavProp = NativeStackNavigationProp<RootStackParamList, 'AddItem'>;
 
@@ -13,14 +19,46 @@ const AddItemScreen: React.FC = () => {
   const [price, setPrice] = useState('');
   const [isVegetarian, setIsVegetarian] = useState(false);
   const [isVegan, setIsVegan] = useState(false);
+  // NEW: State for course selection, defaulting to the first item
+  const [selectedCourse, setSelectedCourse] = useState<CourseType>(COURSES[0]);
+  // NEW: State for image URI
+  const [imageUri, setImageUri] = useState<string | undefined>(undefined); 
 
   const navigation = useNavigation<AddItemNavProp>();
+
+  // --- Image Picker Function ---
+  const handleChoosePhoto = () => {
+    const options: ImagePicker.ImageLibraryOptions = {
+        mediaType: 'photo',
+        quality: 0.5,
+        maxWidth: 800,
+        maxHeight: 800,
+    };
+
+    ImagePicker.launchImageLibrary(options, (response) => {
+        if (response.didCancel) {
+            console.log('User cancelled image picker');
+        } else if (response.errorMessage) {
+            console.log('ImagePicker Error: ', response.errorMessage);
+            Alert.alert('Error', 'Failed to pick image.');
+        } else if (response.assets && response.assets.length > 0) {
+            const uri = response.assets[0].uri;
+            setImageUri(uri);
+        }
+    });
+  };
+  // -----------------------------
 
   const handleSave = () => {
     // Input Validation
     if (dishName.trim() === '' || description.trim() === '' || price.trim() === '') {
       Alert.alert('Missing Info', 'Please fill in the name, description, and price.');
       return;
+    }
+
+    if (!selectedCourse) {
+        Alert.alert('Missing Info', 'Please select a course.');
+        return;
     }
 
     // Validating price is a number
@@ -30,12 +68,15 @@ const AddItemScreen: React.FC = () => {
       return;
     }
 
+    // UPDATED: Include course and imageUri
     const newItem: NewItemType = {
       name: dishName.trim(),
       description: description.trim(),
       price: price.trim(), // Stored as number string for display/math
       vegetarian: isVegetarian,
       vegan: isVegan,
+      course: selectedCourse,
+      imageUri: imageUri,
     };
 
     // Navigating back to Home and pass the new item via route params
@@ -47,11 +88,51 @@ const AddItemScreen: React.FC = () => {
     setPrice('');
     setIsVegetarian(false);
     setIsVegan(false);
+    setSelectedCourse(COURSES[0]); // Reset course
+    setImageUri(undefined); // Reset image
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+        
+        {/* --- Image Uploader Section --- */}
+        <Text style={styles.label}>Dish Picture (Optional)</Text>
+        <TouchableOpacity style={styles.imagePicker} onPress={handleChoosePhoto}>
+          {imageUri ? (
+            <Image source={{ uri: imageUri }} style={styles.imagePreview} />
+          ) : (
+            <Text style={styles.imagePickerText}>Tap to Select an Image 🖼️</Text>
+          )}
+        </TouchableOpacity>
+        <View style={styles.spacerSmall} />
+        {/* ----------------------------- */}
+
+        {/* --- Course Selection Section --- */}
+        <Text style={styles.label}>Course</Text>
+        <ScrollView horizontal style={styles.courseScroll} showsHorizontalScrollIndicator={false}>
+            {COURSES.map(course => (
+                <TouchableOpacity
+                    key={course}
+                    style={[
+                        styles.courseButton,
+                        selectedCourse === course && styles.courseButtonActive
+                    ]}
+                    onPress={() => setSelectedCourse(course)}
+                >
+                    <Text style={[
+                        styles.courseButtonText,
+                        selectedCourse === course && styles.courseButtonTextActive
+                    ]}>
+                        {course}
+                    </Text>
+                </TouchableOpacity>
+            ))}
+        </ScrollView>
+        <View style={styles.spacerSmall} />
+        {/* ----------------------------- */}
+
+
         <Text style={styles.label}>Dish Name</Text>
         <TextInput
           style={styles.input}
@@ -137,6 +218,58 @@ const styles = StyleSheet.create({
     borderBottomColor: '#eee',
   },
   spacer: { height: 30 },
+  spacerSmall: { height: 10 },
+  
+  // --- NEW STYLES FOR IMAGE PICKER ---
+  imagePicker: {
+    borderWidth: 1,
+    borderColor: '#8800C7',
+    borderStyle: 'dashed',
+    borderRadius: 8,
+    height: 150,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 5,
+    backgroundColor: '#f9f5ff',
+  },
+  imagePickerText: {
+    color: '#8800C7',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  imagePreview: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 8,
+    resizeMode: 'cover',
+  },
+
+  // --- NEW STYLES FOR COURSE SELECTION ---
+  courseScroll: { 
+    marginBottom: 15, 
+    maxHeight: 50 
+  },
+  courseButton: {
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginRight: 10,
+    backgroundColor: '#f0f0f0',
+    borderWidth: 1,
+    borderColor: '#eee',
+  },
+  courseButtonActive: {
+    backgroundColor: '#8800C7',
+    borderColor: '#8800C7',
+  },
+  courseButtonText: {
+    color: '#333',
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  courseButtonTextActive: {
+    color: '#fff',
+  },
 });
 
 export default AddItemScreen;

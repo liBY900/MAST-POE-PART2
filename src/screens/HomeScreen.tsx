@@ -5,19 +5,21 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList, MenuItemType, NewItemType, FiltersType } from '../navigation/types';
 
-
+// 1. Define the Predefined List of Courses
+// This list should be used in both HomeScreen and AddItemScreen
+export const COURSES = ['Starter', 'Main Course', 'Dessert', 'Drink', 'Side'];
 
 type HomeRouteProp = RouteProp<RootStackParamList, 'Home'>;
 type HomeNavProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
 
-
+// Update initialMenuItems to include the 'course' property
 const initialMenuItems: MenuItemType[] = [
-  { id: '1', name: 'Grilled Salmon', description: 'With lemon and herbs', price: 'R250', image: require('../../assets/salmon.jpeg'), vegetarian: false, vegan: false },
-  { id: '2', name: 'Mushroom Risotto', description: 'Creamy risotto with wild mushrooms', price: 'R180', image: require('../../assets/risotto.jpeg'), vegetarian: true, vegan: true },
-  { id: '3', name: 'Chocolate Lava Cake', description: 'Warm cake with a molten center', price: 'R95', image: require('../../assets/lava-cake.jpeg'), vegetarian: true, vegan: false },
-  { id: '4', name: 'Lobster and Pasta', description: 'Fresh Atlantic lobster with linguine in a rich butter-garlic sauce', price: 'R450', image: require('../../assets/lobster-pasta.jpeg'), vegetarian: false, vegan: false },
-  { id: '5', name: 'Coconut Rice Bowls', description: 'Fluffy coconut rice topped with pan-seared tofu and fresh vegetables', price: 'R160', image: require('../../assets/Coconut Rice Bowls.jpeg'), vegetarian: true, vegan: true },
-  { id: '6', name: 'Veg Pizza', description: 'Classic stone-baked pizza topped with fresh seasonal vegetables and mozzarella.', price: 'R250', image: require('../../assets/Veg Pizza.jpeg'), vegetarian: true, vegan: false }
+  { id: '1', name: 'Grilled Salmon', description: 'With lemon and herbs', price: 'R250', image: require('../../assets/salmon.jpeg'), vegetarian: false, vegan: false, course: 'Main Course' },
+  { id: '2', name: 'Mushroom Risotto', description: 'Creamy risotto with wild mushrooms', price: 'R180', image: require('../../assets/risotto.jpeg'), vegetarian: true, vegan: true, course: 'Main Course' },
+  { id: '3', name: 'Chocolate Lava Cake', description: 'Warm cake with a molten center', price: 'R95', image: require('../../assets/lava-cake.jpeg'), vegetarian: true, vegan: false, course: 'Dessert' },
+  { id: '4', name: 'Lobster and Pasta', description: 'Fresh Atlantic lobster with linguine in a rich butter-garlic sauce', price: 'R450', image: require('../../assets/lobster-pasta.jpeg'), vegetarian: false, vegan: false, course: 'Main Course' },
+  { id: '5', name: 'Coconut Rice Bowls', description: 'Fluffy coconut rice topped with pan-seared tofu and fresh vegetables', price: 'R160', image: require('../../assets/Coconut Rice Bowls.jpeg'), vegetarian: true, vegan: true, course: 'Starter' },
+  { id: '6', name: 'Veg Pizza', description: 'Classic stone-baked pizza topped with fresh seasonal vegetables and mozzarella.', price: 'R250', image: require('../../assets/Veg Pizza.jpeg'), vegetarian: true, vegan: false, course: 'Main Course' }
 ];
 
 const HomeScreen: React.FC = () => {
@@ -28,6 +30,8 @@ const HomeScreen: React.FC = () => {
   const [filteredItems, setFilteredItems] = useState<MenuItemType[]>(initialMenuItems);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentFilters, setCurrentFilters] = useState<FiltersType | null>(null);
+  // State for selected course filter
+  const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
 
 
   useEffect(() => {
@@ -35,18 +39,18 @@ const HomeScreen: React.FC = () => {
       const newItem: MenuItemType = {
         ...route.params.newItem,
         id: Date.now().toString(),
-        // Placeholder image for user-added items
-        image: require('../../assets/placeholder.jpeg')
+        // Placeholder image for user-added items. Note: If you implement actual image uploading, you'd use route.params.newItem.imageUri here.
+        image: require('../../assets/placeholder.jpeg') 
       };
       setMenuItems(prev => [newItem, ...prev]);
     }
   }, [route.params?.newItem]);
 
-  //  Handling filtering and searching
+  // Handling filtering and searching
   useEffect(() => {
     let items = [...menuItems];
 
-    // Applying search filter
+    // 1. Applying search filter
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       items = items.filter(i =>
@@ -55,7 +59,7 @@ const HomeScreen: React.FC = () => {
       );
     }
 
-    // Applying navigation filters
+    // 2. Applying navigation filters (Vegetarian/Vegan/Price)
     const filters = route.params?.filters || currentFilters;
     if (filters) {
       setCurrentFilters(filters);
@@ -69,23 +73,53 @@ const HomeScreen: React.FC = () => {
         return numericPrice <= priceRange;
       });
     }
+    
+    // 3. Applying Course Filter
+    if (selectedCourse) {
+      items = items.filter(i => i.course === selectedCourse);
+    }
+
 
     setFilteredItems(items);
-  }, [route.params?.filters, menuItems, searchTerm]);
+  }, [route.params?.filters, menuItems, searchTerm, selectedCourse, currentFilters]);
+
+  // Function to toggle course filter
+  const handleCourseFilter = (course: string) => {
+    setSelectedCourse(prev => (prev === course ? null : course));
+  };
+
 
   const renderItem = ({ item }: { item: MenuItemType }) => (
     <View style={styles.menuItem}>
       {item.image && <Image source={item.image} style={styles.menuImage} />}
       <View style={styles.itemDetails}>
         <Text style={styles.itemName}>{item.name}</Text>
+        <Text style={styles.courseTag}>{item.course}</Text> 
         <Text style={styles.itemDescription} numberOfLines={2} ellipsizeMode="tail">{item.description}</Text>
         <Text style={styles.itemPrice}>R{item.price.replace('R', '')}</Text>
         <View style={styles.tagContainer}>
-          {item.vegetarian && <Text style={styles.tag}>🌱 Veg</Text>}
-          {item.vegan && <Text style={styles.tag}>Vgn</Text>}
+          {item.vegetarian && <Text style={styles.dietTag}>🌱 Veg</Text>}
+          {item.vegan && <Text style={styles.dietTag}>Vgn</Text>}
         </View>
       </View>
     </View>
+  );
+
+  const renderCourseFilter = ({ item }: { item: string }) => (
+    <TouchableOpacity
+      style={[
+        styles.courseButton,
+        selectedCourse === item && styles.courseButtonActive
+      ]}
+      onPress={() => handleCourseFilter(item)}
+    >
+      <Text style={[
+        styles.courseButtonText,
+        selectedCourse === item && styles.courseButtonTextActive
+      ]}>
+        {item}
+      </Text>
+    </TouchableOpacity>
   );
 
   return (
@@ -97,6 +131,18 @@ const HomeScreen: React.FC = () => {
           value={searchTerm}
           onChangeText={setSearchTerm}
         />
+        
+        {/* Course Filter Horizontal List */}
+        <FlatList
+          data={COURSES}
+          renderItem={renderCourseFilter}
+          keyExtractor={(item) => item}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.courseList}
+          contentContainerStyle={styles.courseListContent}
+        />
+        {/* ----------------------------- */}
 
         <FlatList
           data={filteredItems}
@@ -105,6 +151,7 @@ const HomeScreen: React.FC = () => {
           ListEmptyComponent={() => (
             <Text style={styles.emptyText}>No items found matching your criteria.</Text>
           )}
+          style={{ flex: 1 }} // Ensure FlatList takes up remaining space
         />
 
         {/* Fixed Footer/Button Container */}
@@ -114,7 +161,7 @@ const HomeScreen: React.FC = () => {
             style={styles.filterButton}
             onPress={() => navigation.navigate('Filter', { currentFilters: currentFilters || { isVegetarian: false, isVegan: false, priceRange: 500 } as FiltersType })}
           >
-            <Text style={styles.filterButtonText}>Filter</Text>
+            <Text style={styles.filterButtonText}>Diet/Price Filter</Text>
           </TouchableOpacity>
 
           {/* Adding Item Button */}
@@ -143,6 +190,43 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     backgroundColor: '#f5f5f5',
   },
+  // NEW STYLES
+  courseList: {
+    marginBottom: 10,
+    marginTop: 5,
+    maxHeight: 40, // Limit height of horizontal list
+  },
+  courseListContent: {
+    paddingRight: 30, // Extra space at the end
+  },
+  courseButton: {
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginRight: 10,
+    backgroundColor: '#f0f0f0',
+    borderWidth: 1,
+    borderColor: '#ccc',
+  },
+  courseButtonActive: {
+    backgroundColor: '#8800C7',
+    borderColor: '#8800C7',
+  },
+  courseButtonText: {
+    color: '#333',
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  courseButtonTextActive: {
+    color: '#fff',
+  },
+  courseTag: {
+    fontSize: 12,
+    color: '#8800C7',
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  // END NEW STYLES
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -162,9 +246,8 @@ const styles = StyleSheet.create({
   itemDescription: { fontSize: 14, color: '#666', marginTop: 2 },
   itemPrice: { fontSize: 16, color: '#8800C7', fontWeight: 'bold', marginTop: 5 },
   tagContainer: { flexDirection: 'row', marginTop: 5 },
-  tag: { fontSize: 12, color: '#fff', backgroundColor: '#00C788', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 10, marginRight: 5 },
+  dietTag: { fontSize: 12, color: '#fff', backgroundColor: '#00C788', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 10, marginRight: 5 },
   emptyText: { textAlign: 'center', marginTop: 50, fontSize: 16, color: '#888' },
-
   // Floating Buttons
   buttonContainer: {
     position: 'absolute',
@@ -180,6 +263,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 6,
+    marginTop: 10, // Added margin to separate from the filter button
   },
   buttonText: { color: '#fff', fontSize: 30, lineHeight: 30 },
   filterButton: {
@@ -187,7 +271,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 10,
     borderRadius: 25,
-    marginBottom: 10,
+    // marginBottom: 10, Removed to align with floating button
     elevation: 4,
   },
   filterButtonText: { color: '#fff', fontWeight: 'bold' },
