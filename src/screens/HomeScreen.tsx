@@ -1,7 +1,10 @@
+// src/screens/HomeScreen.tsx
+
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, Image, TouchableOpacity, TextInput, SafeAreaView } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'; 
+// Import CourseType for use in function signatures
 import type { RootStackParamList, MenuItemType, NewItemType, FiltersType, CourseType } from '../navigation/types';
 
 export const COURSES: CourseType[] = ['Starter', 'Main Course', 'Dessert'];
@@ -26,7 +29,6 @@ const HomeScreen: React.FC = () => {
   const [filteredItems, setFilteredItems] = useState<MenuItemType[]>(initialMenuItems);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentFilters, setCurrentFilters] = useState<FiltersType | null>(null);
-  // State for selected course filter 
   const [selectedCourse, setSelectedCourse] = useState<CourseType | null>(null);
 
 
@@ -43,7 +45,6 @@ const HomeScreen: React.FC = () => {
       };
 
       setMenuItems(prev => [newItem, ...prev]);
-      // Clearing the newItem param after processing it
       navigation.setParams({ newItem: undefined });
     }
   }, [route.params?.newItem, navigation]);
@@ -73,14 +74,14 @@ const HomeScreen: React.FC = () => {
       navigation.setParams({ filters: undefined });
     } 
     
-    //  Handling incoming Course filter from FilterScreen
+    // Handling incoming Course filter from FilterScreen
     if (route.params?.selectedCourse !== undefined) {
         setSelectedCourse(route.params.selectedCourse);
         navigation.setParams({ selectedCourse: undefined });
     }
 
 
-    //  Applying navigation filters (Vegetarian/Vegan/Price)
+    // Applying navigation filters (Vegetarian/Vegan/Price)
     if (filters) {
       const { isVegetarian, isVegan, priceRange } = filters;
 
@@ -93,7 +94,7 @@ const HomeScreen: React.FC = () => {
       });
     }
 
-    //  Applying Course Filter
+    // Applying Course Filter
     if (selectedCourse) {
       items = items.filter(i => i.course === selectedCourse);
     }
@@ -112,7 +113,12 @@ const HomeScreen: React.FC = () => {
     navigation
   ]);
 
-  const handleCourseFilter = (course: string) => {
+  /**
+   * FIX: Changed parameter type from 'string' to 'CourseType'.
+   * This resolves the TypeScript error as it ensures the value passed 
+   * to setSelectedCourse matches the expected type.
+   */
+  const handleCourseFilter = (course: CourseType) => {
     setSelectedCourse(prev => (prev === course ? null : course));
   };
 
@@ -139,7 +145,10 @@ const HomeScreen: React.FC = () => {
     </View>
   );
 
-  const renderCourseFilter = ({ item }: { item: string }) => (
+  /**
+   * FIX: Changed item type from 'string' to 'CourseType' for consistency.
+   */
+  const renderCourseFilter = ({ item }: { item: CourseType }) => (
     <TouchableOpacity
       style={[
         styles.courseButton,
