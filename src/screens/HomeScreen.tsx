@@ -2,17 +2,13 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, Image, TouchableOpacity, TextInput, SafeAreaView } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList, MenuItemType, NewItemType, FiltersType } from '../navigation/types';
+import type { RootStackParamList, MenuItemType, NewItemType, FiltersType, CourseType } from '../navigation/types';
 
-// 1. Define the Predefined List of Courses
-// This list should be used in both HomeScreen and AddItemScreen
-export const COURSES = ['Starter', 'Main Course', 'Dessert', 'Drink', 'Side'];
+export const COURSES: CourseType[] = ['Starter', 'Main Course', 'Dessert'];
 
 type HomeRouteProp = RouteProp<RootStackParamList, 'Home'>;
 type HomeNavProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
 
-// Update initialMenuItems to include the 'course' property
 const initialMenuItems: MenuItemType[] = [
   { id: '1', name: 'Grilled Salmon', description: 'With lemon and herbs', price: 'R250', image: require('../../assets/salmon.jpeg'), vegetarian: false, vegan: false, course: 'Main Course' },
   { id: '2', name: 'Mushroom Risotto', description: 'Creamy risotto with wild mushrooms', price: 'R180', image: require('../../assets/risotto.jpeg'), vegetarian: true, vegan: true, course: 'Main Course' },
@@ -36,15 +32,21 @@ const HomeScreen: React.FC = () => {
 
   useEffect(() => {
     if (route.params?.newItem) {
+      const newImageSource = route.params.newItem.imageUri
+        ? { uri: route.params.newItem.imageUri } as any 
+        : require('../../assets/placeholder.jpeg');
+
       const newItem: MenuItemType = {
         ...route.params.newItem,
         id: Date.now().toString(),
-        // Placeholder image for user-added items. Note: If you implement actual image uploading, you'd use route.params.newItem.imageUri here.
-        image: require('../../assets/placeholder.jpeg') 
+        image: newImageSource
       };
+
       setMenuItems(prev => [newItem, ...prev]);
+      // Clear the newItem param after processing it
+      navigation.setParams({ newItem: undefined });
     }
-  }, [route.params?.newItem]);
+  }, [route.params?.newItem, navigation]);
 
   // Handling filtering and searching
   useEffect(() => {
@@ -60,9 +62,19 @@ const HomeScreen: React.FC = () => {
     }
 
     // 2. Applying navigation filters (Vegetarian/Vegan/Price)
-    const filters = route.params?.filters || currentFilters;
+    let filters = route.params?.filters || currentFilters;
+
+    if (route.params?.filters) {
+      setCurrentFilters(route.params.filters);
+      navigation.setParams({ filters: undefined });
+    } else if (route.params?.filters === undefined) {
+      // If filters are cleared from FilterScreen
+      setCurrentFilters(null);
+      filters = null; // Ensure filters is null for the filtering logic below
+      navigation.setParams({ filters: undefined });
+    }
+
     if (filters) {
-      setCurrentFilters(filters);
       const { isVegetarian, isVegan, priceRange } = filters;
 
       if (isVegetarian) items = items.filter(i => i.vegetarian);
@@ -73,15 +85,16 @@ const HomeScreen: React.FC = () => {
         return numericPrice <= priceRange;
       });
     }
-    
+
     // 3. Applying Course Filter
     if (selectedCourse) {
+      
       items = items.filter(i => i.course === selectedCourse);
     }
 
 
     setFilteredItems(items);
-  }, [route.params?.filters, menuItems, searchTerm, selectedCourse, currentFilters]);
+  }, [route.params?.filters, menuItems, searchTerm, selectedCourse, currentFilters, navigation]);
 
   // Function to toggle course filter
   const handleCourseFilter = (course: string) => {
@@ -91,10 +104,16 @@ const HomeScreen: React.FC = () => {
 
   const renderItem = ({ item }: { item: MenuItemType }) => (
     <View style={styles.menuItem}>
-      {item.image && <Image source={item.image} style={styles.menuImage} />}
+      {/* Handle both local image require (number) and URI (object with uri) */}
+      {item.image && (
+        <Image
+          source={typeof item.image === 'number' ? item.image : { uri: item.image.uri || item.image.name }}
+          style={styles.menuImage}
+        />
+      )}
       <View style={styles.itemDetails}>
         <Text style={styles.itemName}>{item.name}</Text>
-        <Text style={styles.courseTag}>{item.course}</Text> 
+        <Text style={styles.courseTag}>{item.course}</Text>
         <Text style={styles.itemDescription} numberOfLines={2} ellipsizeMode="tail">{item.description}</Text>
         <Text style={styles.itemPrice}>R{item.price.replace('R', '')}</Text>
         <View style={styles.tagContainer}>
@@ -131,7 +150,7 @@ const HomeScreen: React.FC = () => {
           value={searchTerm}
           onChangeText={setSearchTerm}
         />
-        
+
         {/* Course Filter Horizontal List */}
         <FlatList
           data={COURSES}
@@ -161,7 +180,7 @@ const HomeScreen: React.FC = () => {
             style={styles.filterButton}
             onPress={() => navigation.navigate('Filter', { currentFilters: currentFilters || { isVegetarian: false, isVegan: false, priceRange: 500 } as FiltersType })}
           >
-            <Text style={styles.filterButtonText}>Diet/Price Filter</Text>
+            <Text style={styles.filterButtonText}>Filter</Text>
           </TouchableOpacity>
 
           {/* Adding Item Button */}
@@ -190,14 +209,14 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     backgroundColor: '#f5f5f5',
   },
-  // NEW STYLES
+  
   courseList: {
     marginBottom: 10,
     marginTop: 5,
-    maxHeight: 40, // Limit height of horizontal list
+    maxHeight: 40, 
   },
   courseListContent: {
-    paddingRight: 30, // Extra space at the end
+    paddingRight: 30, 
   },
   courseButton: {
     paddingHorizontal: 15,
@@ -263,7 +282,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 6,
-    marginTop: 10, // Added margin to separate from the filter button
+    marginTop: 10, 
   },
   buttonText: { color: '#fff', fontSize: 30, lineHeight: 30 },
   filterButton: {
@@ -271,7 +290,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 10,
     borderRadius: 25,
-    // marginBottom: 10, Removed to align with floating button
     elevation: 4,
   },
   filterButtonText: { color: '#fff', fontWeight: 'bold' },

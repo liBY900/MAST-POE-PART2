@@ -6,30 +6,23 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList, FiltersType, CourseType } from '../navigation/types.ts';
 
-// Define the available course categories (Keep this synchronized with your types.ts)
-const COURSES: CourseType[] = ['Starter', 'Main Course', 'Dessert', 'Drink', 'Side'];
+// Define the available course categories - UPDATED to remove 'Drink' and 'Side'
+const COURSES: CourseType[] = ['Starter', 'Main Course', 'Dessert'];
 
 type FilterNavProp = NativeStackNavigationProp<RootStackParamList, 'Filter'>;
 type FilterRouteProp = RouteProp<RootStackParamList, 'Filter'>;
 
-// Note: FiltersType in your types.ts does NOT currently include 'course'. 
-// We will need to update types.ts if you want to pass 'course' through filters.
 
 const FilterScreen: React.FC = () => {
   const navigation = useNavigation<FilterNavProp>();
   const route = useRoute<FilterRouteProp>();
-
-  // NOTE: Assuming `FiltersType` is expanded to include `selectedCourse` 
-  // if you want to persist the course filter from this screen.
   const initialFilters = route.params?.currentFilters || { isVegetarian: false, isVegan: false, priceRange: 500 };
 
   const [isVegetarian, setIsVegetarian] = useState(initialFilters.isVegetarian);
   const [isVegan, setIsVegan] = useState(initialFilters.isVegan);
   const [priceRange, setPriceRange] = useState(initialFilters.priceRange);
-  // NEW: State for course filter. Start as null (no filter).
   const [selectedCourse, setSelectedCourse] = useState<CourseType | null>(null); 
   
-  // Toggle function for course selection
   const toggleCourseFilter = (course: CourseType) => {
     setSelectedCourse(prev => (prev === course ? null : course));
   };
@@ -40,21 +33,11 @@ const FilterScreen: React.FC = () => {
       isVegetarian,
       isVegan,
       priceRange,
-      // You would pass the course filter here if FiltersType was updated:
-      // selectedCourse: selectedCourse, 
     };
 
     // Navigating back to Home and pass the filters
-    // IMPORTANT: Since your Home Screen already handles course filtering via its own state,
-    // we'll primarily rely on that. If you apply a course filter here, you'll need 
-    // to pass it as a separate param to Home OR update FiltersType.
-    
-    // For now, we only pass price and dietary filters back:
+    // For this pattern, we only pass price and dietary filters back:
     navigation.navigate('Home', { filters }); 
-    
-    // *** If you want to also pass the selected course back: ***
-    // navigation.navigate('Home', { filters, selectedCourse }); 
-    // ... then update RootStackParamList and HomeScreen to receive 'selectedCourse'
   };
 
   const handleClearFilters = () => {
@@ -152,7 +135,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, padding: 20 },
   header: { fontSize: 20, fontWeight: 'bold', color: '#333', marginTop: 15, marginBottom: 15, borderBottomWidth: 1, borderBottomColor: '#eee', paddingBottom: 5 },
   
-  // NEW STYLES FOR COURSE FILTER
+  // STYLES FOR COURSE FILTER
   courseContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -182,7 +165,6 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   
-
   filterOption: {
     flexDirection: 'row',
     justifyContent: 'space-between',

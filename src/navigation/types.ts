@@ -1,27 +1,20 @@
 // src/navigation/types.ts
+export type CourseType = 'Starter' | 'Main Course' | 'Dessert';
 
-// Define the available course categories
-export type CourseType = 'Starter' | 'Main Course' | 'Dessert' | 'Drink' | 'Side';
-
-// --- New Item Structure (Used for passing data from AddItemScreen to HomeScreen) ---
 export type NewItemType = {
   name: string;
   description: string;
-  price: string; // e.g., '250' (before 'R' is added)
+  price: string;
   vegetarian: boolean;
   vegan: boolean;
-  // NEW FIELD: Course selection
-  course: CourseType;
-  // NEW FIELD: Image URI from the image upload
-  imageUri?: string; 
+  course: CourseType; // This is for 'Starter' | 'Main Course' | 'Dessert'
+  imageUri?: string;
 };
 
-// --- Menu Item Structure (Used for displaying existing items) ---
+
 export type MenuItemType = NewItemType & {
   id: string;
-  // NOTE: 'image' is used for local static assets (like require('...')). 
-  // We keep it as 'any' for compatibility with existing local images, 
-  // but for user-uploaded items, you'll use 'imageUri' from NewItemType.
+  
   image: any; 
 };
 

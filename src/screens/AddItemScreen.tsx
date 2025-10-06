@@ -1,13 +1,14 @@
 // src/screens/AddItemScreen.tsx
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, SafeAreaView, Switch,TouchableOpacity, Image,} from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, SafeAreaView, Switch, TouchableOpacity, Image, } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList, NewItemType, CourseType } from '../navigation/types.ts';
 
 
-const COURSES: CourseType[] = ['Starter', 'Main Course', 'Dessert', 'Drink', 'Side'];
-import * as ImagePicker from 'react-native-image-picker'; 
+
+const COURSES: CourseType[] = ['Starter', 'Main Course', 'Dessert'];
+import * as ImagePicker from 'react-native-image-picker';
 
 
 
@@ -19,32 +20,32 @@ const AddItemScreen: React.FC = () => {
   const [price, setPrice] = useState('');
   const [isVegetarian, setIsVegetarian] = useState(false);
   const [isVegan, setIsVegan] = useState(false);
-  // NEW: State for course selection, defaulting to the first item
+ 
   const [selectedCourse, setSelectedCourse] = useState<CourseType>(COURSES[0]);
-  // NEW: State for image URI
-  const [imageUri, setImageUri] = useState<string | undefined>(undefined); 
+  
+  const [imageUri, setImageUri] = useState<string | undefined>(undefined);
 
   const navigation = useNavigation<AddItemNavProp>();
 
   // --- Image Picker Function ---
   const handleChoosePhoto = () => {
     const options: ImagePicker.ImageLibraryOptions = {
-        mediaType: 'photo',
-        quality: 0.5,
-        maxWidth: 800,
-        maxHeight: 800,
+      mediaType: 'photo',
+      quality: 0.5,
+      maxWidth: 800,
+      maxHeight: 800,
     };
 
     ImagePicker.launchImageLibrary(options, (response) => {
-        if (response.didCancel) {
-            console.log('User cancelled image picker');
-        } else if (response.errorMessage) {
-            console.log('ImagePicker Error: ', response.errorMessage);
-            Alert.alert('Error', 'Failed to pick image.');
-        } else if (response.assets && response.assets.length > 0) {
-            const uri = response.assets[0].uri;
-            setImageUri(uri);
-        }
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.errorMessage) {
+        console.log('ImagePicker Error: ', response.errorMessage);
+        Alert.alert('Error', 'Failed to pick image.');
+      } else if (response.assets && response.assets.length > 0) {
+        const uri = response.assets[0].uri;
+        setImageUri(uri);
+      }
     });
   };
   // -----------------------------
@@ -57,8 +58,8 @@ const AddItemScreen: React.FC = () => {
     }
 
     if (!selectedCourse) {
-        Alert.alert('Missing Info', 'Please select a course.');
-        return;
+      Alert.alert('Missing Info', 'Please select a course.');
+      return;
     }
 
     // Validating price is a number
@@ -68,11 +69,11 @@ const AddItemScreen: React.FC = () => {
       return;
     }
 
-    // UPDATED: Include course and imageUri
+    
     const newItem: NewItemType = {
       name: dishName.trim(),
       description: description.trim(),
-      price: price.trim(), // Stored as number string for display/math
+      price: price.trim(), 
       vegetarian: isVegetarian,
       vegan: isVegan,
       course: selectedCourse,
@@ -95,7 +96,7 @@ const AddItemScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-        
+
         {/* --- Image Uploader Section --- */}
         <Text style={styles.label}>Dish Picture (Optional)</Text>
         <TouchableOpacity style={styles.imagePicker} onPress={handleChoosePhoto}>
@@ -111,23 +112,23 @@ const AddItemScreen: React.FC = () => {
         {/* --- Course Selection Section --- */}
         <Text style={styles.label}>Course</Text>
         <ScrollView horizontal style={styles.courseScroll} showsHorizontalScrollIndicator={false}>
-            {COURSES.map(course => (
-                <TouchableOpacity
-                    key={course}
-                    style={[
-                        styles.courseButton,
-                        selectedCourse === course && styles.courseButtonActive
-                    ]}
-                    onPress={() => setSelectedCourse(course)}
-                >
-                    <Text style={[
-                        styles.courseButtonText,
-                        selectedCourse === course && styles.courseButtonTextActive
-                    ]}>
-                        {course}
-                    </Text>
-                </TouchableOpacity>
-            ))}
+          {COURSES.map(course => (
+            <TouchableOpacity
+              key={course}
+              style={[
+                styles.courseButton,
+                selectedCourse === course && styles.courseButtonActive
+              ]}
+              onPress={() => setSelectedCourse(course)}
+            >
+              <Text style={[
+                styles.courseButtonText,
+                selectedCourse === course && styles.courseButtonTextActive
+              ]}>
+                {course}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </ScrollView>
         <View style={styles.spacerSmall} />
         {/* ----------------------------- */}
@@ -219,7 +220,7 @@ const styles = StyleSheet.create({
   },
   spacer: { height: 30 },
   spacerSmall: { height: 10 },
-  
+
   // --- NEW STYLES FOR IMAGE PICKER ---
   imagePicker: {
     borderWidth: 1,
@@ -245,9 +246,9 @@ const styles = StyleSheet.create({
   },
 
   // --- NEW STYLES FOR COURSE SELECTION ---
-  courseScroll: { 
-    marginBottom: 15, 
-    maxHeight: 50 
+  courseScroll: {
+    marginBottom: 15,
+    maxHeight: 50
   },
   courseButton: {
     paddingHorizontal: 15,
