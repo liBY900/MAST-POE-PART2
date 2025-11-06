@@ -1,10 +1,7 @@
-// src/screens/HomeScreen.tsx
-
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, Image, TouchableOpacity, TextInput, SafeAreaView } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'; 
-// Import CourseType for use in function signatures
 import type { RootStackParamList, MenuItemType, NewItemType, FiltersType, CourseType } from '../navigation/types';
 
 export const COURSES: CourseType[] = ['Starter', 'Main Course', 'Dessert'];
@@ -31,6 +28,11 @@ const HomeScreen: React.FC = () => {
   const [currentFilters, setCurrentFilters] = useState<FiltersType | null>(null);
   const [selectedCourse, setSelectedCourse] = useState<CourseType | null>(null);
 
+  const calculateAveragePrice = (course: string) => {
+    const items = menuItems.filter(item => item.course === course);
+    const total = items.reduce((sum, i) => sum + parseInt(i.price.replace('R', ''), 10), 0);
+    return items.length ? (total / items.length).toFixed(2) : '0.00';
+  };
 
   useEffect(() => {
     if (route.params?.newItem) {
@@ -49,11 +51,8 @@ const HomeScreen: React.FC = () => {
     }
   }, [route.params?.newItem, navigation]);
 
-  // Handling filtering and searching
   useEffect(() => {
     let items = [...menuItems];
-
-    // 1. Applying search filter
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       items = items.filter(i =>
@@ -62,45 +61,31 @@ const HomeScreen: React.FC = () => {
       );
     }
 
-    // --- START FILTER SCREEN LOGIC ---
-
-    // Handling incoming dietary/price filters from FilterScreen
     let filters = route.params?.filters || currentFilters;
-
-    // Checking if new filters arrived from the FilterScreen
     if (route.params?.filters !== undefined) {
       setCurrentFilters(route.params.filters || null); 
       filters = route.params.filters; 
       navigation.setParams({ filters: undefined });
     } 
     
-    // Handling incoming Course filter from FilterScreen
     if (route.params?.selectedCourse !== undefined) {
         setSelectedCourse(route.params.selectedCourse);
         navigation.setParams({ selectedCourse: undefined });
     }
 
-
-    // Applying navigation filters (Vegetarian/Vegan/Price)
     if (filters) {
       const { isVegetarian, isVegan, priceRange } = filters;
-
       if (isVegetarian) items = items.filter(i => i.vegetarian);
       if (isVegan) items = items.filter(i => i.vegan);
-
       items = items.filter(i => {
         const numericPrice = parseInt(String(i.price).replace('R', ''), 10) || 0;
         return numericPrice <= priceRange;
       });
     }
 
-    // Applying Course Filter
     if (selectedCourse) {
       items = items.filter(i => i.course === selectedCourse);
     }
-    
-    // --- END FILTER SCREEN LOGIC ---
-
 
     setFilteredItems(items);
   }, [
@@ -113,19 +98,12 @@ const HomeScreen: React.FC = () => {
     navigation
   ]);
 
-  /**
-   * FIX: Changed parameter type from 'string' to 'CourseType'.
-   * This resolves the TypeScript error as it ensures the value passed 
-   * to setSelectedCourse matches the expected type.
-   */
   const handleCourseFilter = (course: CourseType) => {
     setSelectedCourse(prev => (prev === course ? null : course));
   };
 
-
   const renderItem = ({ item }: { item: MenuItemType }) => (
     <View style={styles.menuItem}>
-      {/* Handle both local image require (number) and URI (object with uri) */}
       {item.image && (
         <Image
           source={typeof item.image === 'number' ? item.image : { uri: item.image.uri || item.image.name }}
@@ -135,7 +113,7 @@ const HomeScreen: React.FC = () => {
       <View style={styles.itemDetails}>
         <Text style={styles.itemName}>{item.name}</Text>
         <Text style={styles.courseTag}>{item.course}</Text>
-        <Text style={styles.itemDescription} numberOfLines={2} ellipsizeMode="tail">{item.description}</Text>
+        <Text style={styles.itemDescription} numberOfLines={2}>{item.description}</Text>
         <Text style={styles.itemPrice}>R{item.price.replace('R', '')}</Text>
         <View style={styles.tagContainer}>
           {item.vegetarian && <Text style={styles.dietTag}>🌱 Veg</Text>}
@@ -145,21 +123,12 @@ const HomeScreen: React.FC = () => {
     </View>
   );
 
-  /**
-   * FIX: Changed item type from 'string' to 'CourseType' for consistency.
-   */
   const renderCourseFilter = ({ item }: { item: CourseType }) => (
     <TouchableOpacity
-      style={[
-        styles.courseButton,
-        selectedCourse === item && styles.courseButtonActive
-      ]}
+      style={[styles.courseButton, selectedCourse === item && styles.courseButtonActive]}
       onPress={() => handleCourseFilter(item)}
     >
-      <Text style={[
-        styles.courseButtonText,
-        selectedCourse === item && styles.courseButtonTextActive
-      ]}>
+      <Text style={[styles.courseButtonText, selectedCourse === item && styles.courseButtonTextActive]}>
         {item}
       </Text>
     </TouchableOpacity>
@@ -175,7 +144,7 @@ const HomeScreen: React.FC = () => {
           onChangeText={setSearchTerm}
         />
 
-        {/* Course Filter Horizontal List */}
+        {/* Course Filter List */}
         <FlatList
           data={COURSES}
           renderItem={renderCourseFilter}
@@ -185,7 +154,24 @@ const HomeScreen: React.FC = () => {
           style={styles.courseList}
           contentContainerStyle={styles.courseListContent}
         />
-        {/* ----------------------------- */}
+
+        {/* --- Average Prices Section --- */}
+        <View style={styles.averageContainer}>
+          <Text style={styles.averageTitle}>Average Prices by Course</Text>
+          <View style={styles.averageRow}>
+            <Text style={styles.averageLabel}>Starter:</Text>
+            <Text style={styles.averageValue}>R{calculateAveragePrice('Starter')}</Text>
+          </View>
+          <View style={styles.averageRow}>
+            <Text style={styles.averageLabel}>Main Course:</Text>
+            <Text style={styles.averageValue}>R{calculateAveragePrice('Main Course')}</Text>
+          </View>
+          <View style={styles.averageRow}>
+            <Text style={styles.averageLabel}>Dessert:</Text>
+            <Text style={styles.averageValue}>R{calculateAveragePrice('Dessert')}</Text>
+          </View>
+        </View>
+        {/* --- End Average Prices Section --- */}
 
         <FlatList
           data={filteredItems}
@@ -197,9 +183,7 @@ const HomeScreen: React.FC = () => {
           style={{ flex: 1 }} 
         />
 
-        {/* Fixed Footer/Button Container */}
         <View style={styles.buttonContainer}>
-          {/* Filter Button */}
           <TouchableOpacity
             style={styles.filterButton}
             onPress={() => navigation.navigate('Filter', { 
@@ -210,7 +194,6 @@ const HomeScreen: React.FC = () => {
             <Text style={styles.filterButtonText}>Filter</Text>
           </TouchableOpacity>
 
-          {/* Adding Item Button */}
           <TouchableOpacity
             style={styles.floatingButton}
             onPress={() => navigation.navigate('AddItem')}
@@ -223,7 +206,7 @@ const HomeScreen: React.FC = () => {
   );
 };
 
-// --- Styles (Unchanged) ---
+// --- Styles ---
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#fff' },
   container: { flex: 1, paddingHorizontal: 15, paddingVertical: 5 },
@@ -236,15 +219,8 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     backgroundColor: '#f5f5f5',
   },
-  
-  courseList: {
-    marginBottom: 10,
-    marginTop: 5,
-    maxHeight: 40, 
-  },
-  courseListContent: {
-    paddingRight: 30, 
-  },
+  courseList: { marginBottom: 10, marginTop: 5, maxHeight: 40 },
+  courseListContent: { paddingRight: 30 },
   courseButton: {
     paddingHorizontal: 15,
     paddingVertical: 8,
@@ -254,24 +230,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
   },
-  courseButtonActive: {
-    backgroundColor: '#8800C7',
-    borderColor: '#8800C7',
-  },
-  courseButtonText: {
-    color: '#333',
-    fontWeight: '600',
-    fontSize: 14,
-  },
-  courseButtonTextActive: {
-    color: '#fff',
-  },
-  courseTag: {
-    fontSize: 12,
-    color: '#8800C7',
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
+  courseButtonActive: { backgroundColor: '#8800C7', borderColor: '#8800C7' },
+  courseButtonText: { color: '#333', fontWeight: '600', fontSize: 14 },
+  courseButtonTextActive: { color: '#fff' },
+  courseTag: { fontSize: 12, color: '#8800C7', fontWeight: 'bold', marginBottom: 5 },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -291,7 +253,15 @@ const styles = StyleSheet.create({
   itemDescription: { fontSize: 14, color: '#666', marginTop: 2 },
   itemPrice: { fontSize: 16, color: '#8800C7', fontWeight: 'bold', marginTop: 5 },
   tagContainer: { flexDirection: 'row', marginTop: 5 },
-  dietTag: { fontSize: 12, color: '#fff', backgroundColor: '#00C788', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 10, marginRight: 5 },
+  dietTag: {
+    fontSize: 12,
+    color: '#fff',
+    backgroundColor: '#00C788',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 10,
+    marginRight: 5,
+  },
   emptyText: { textAlign: 'center', marginTop: 50, fontSize: 16, color: '#888' },
   buttonContainer: {
     position: 'absolute',
@@ -307,7 +277,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 6,
-    marginTop: 10, 
+    marginTop: 10,
   },
   buttonText: { color: '#fff', fontSize: 30, lineHeight: 30 },
   filterButton: {
@@ -319,6 +289,35 @@ const styles = StyleSheet.create({
   },
   filterButtonText: { color: '#fff', fontWeight: 'bold' },
 
+  // --- NEW STYLES FOR AVERAGES ---
+  averageContainer: {
+    backgroundColor: '#f9f5ff',
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: '#e8d4ff',
+  },
+  averageTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#8800C7',
+    marginBottom: 10,
+  },
+  averageRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 5,
+  },
+  averageLabel: {
+    fontSize: 14,
+    color: '#555',
+  },
+  averageValue: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#333',
+  },
 });
 
 export default HomeScreen;
