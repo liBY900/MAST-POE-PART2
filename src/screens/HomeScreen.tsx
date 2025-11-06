@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, Image, TouchableOpacity, TextInput, SafeAreaView } from 'react-native';
+import { 
+  View, Text, FlatList, StyleSheet, Image, TouchableOpacity, 
+  TextInput, SafeAreaView, Alert 
+} from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'; 
-import type { RootStackParamList, MenuItemType, NewItemType, FiltersType, CourseType } from '../navigation/types';
+import type { RootStackParamList, MenuItemType, FiltersType, CourseType } from '../navigation/types';
 
 export const COURSES: CourseType[] = ['Starter', 'Main Course', 'Dessert'];
 
@@ -34,6 +37,7 @@ const HomeScreen: React.FC = () => {
     return items.length ? (total / items.length).toFixed(2) : '0.00';
   };
 
+  // ✅ Add new item
   useEffect(() => {
     if (route.params?.newItem) {
       const newImageSource = route.params.newItem.imageUri
@@ -51,6 +55,18 @@ const HomeScreen: React.FC = () => {
     }
   }, [route.params?.newItem, navigation]);
 
+  // ✅ Edit item
+  useEffect(() => {
+    if (route.params?.editedItem) {
+      const updated = route.params.editedItem;
+      setMenuItems(prev =>
+        prev.map(item => (item.id === updated.id ? { ...item, ...updated } : item))
+      );
+      navigation.setParams({ editedItem: undefined });
+    }
+  }, [route.params?.editedItem, navigation]);
+
+  // ✅ Apply filters, course, and search
   useEffect(() => {
     let items = [...menuItems];
     if (searchTerm) {
@@ -69,8 +85,8 @@ const HomeScreen: React.FC = () => {
     } 
     
     if (route.params?.selectedCourse !== undefined) {
-        setSelectedCourse(route.params.selectedCourse);
-        navigation.setParams({ selectedCourse: undefined });
+      setSelectedCourse(route.params.selectedCourse);
+      navigation.setParams({ selectedCourse: undefined });
     }
 
     if (filters) {
@@ -102,25 +118,64 @@ const HomeScreen: React.FC = () => {
     setSelectedCourse(prev => (prev === course ? null : course));
   };
 
+  const handleDelete = (id: string) => {
+    Alert.alert(
+      'Delete Item',
+      'Are you sure you want to delete this menu item?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Delete', style: 'destructive', onPress: () => {
+            setMenuItems(prev => prev.filter(item => item.id !== id));
+          } 
+        },
+      ]
+    );
+  };
+
+  const handleEdit = (item: MenuItemType) => {
+    navigation.navigate('AddItem', { editItem: item });
+  };
+
+  // ✅ Only ONE renderItem function now (tap-to-edit included)
   const renderItem = ({ item }: { item: MenuItemType }) => (
-    <View style={styles.menuItem}>
+    <TouchableOpacity 
+      onPress={() => handleEdit(item)} 
+      activeOpacity={0.9} 
+      style={styles.menuItem}
+    >
       {item.image && (
         <Image
-          source={typeof item.image === 'number' ? item.image : { uri: item.image.uri || item.image.name }}
+          source={
+            typeof item.image === 'number'
+              ? item.image
+              : { uri: item.image.uri || item.image.name }
+          }
           style={styles.menuImage}
         />
       )}
       <View style={styles.itemDetails}>
         <Text style={styles.itemName}>{item.name}</Text>
         <Text style={styles.courseTag}>{item.course}</Text>
-        <Text style={styles.itemDescription} numberOfLines={2}>{item.description}</Text>
+        <Text style={styles.itemDescription} numberOfLines={2}>
+          {item.description}
+        </Text>
         <Text style={styles.itemPrice}>R{item.price.replace('R', '')}</Text>
+
         <View style={styles.tagContainer}>
           {item.vegetarian && <Text style={styles.dietTag}>🌱 Veg</Text>}
           {item.vegan && <Text style={styles.dietTag}>Vgn</Text>}
         </View>
+
+        <View style={styles.actionButtons}>
+          <TouchableOpacity style={styles.editButton} onPress={() => handleEdit(item)}>
+            <Text style={styles.editText}>✏️ Edit</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete(item.id)}>
+            <Text style={styles.deleteText}>🗑️ Delete</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   const renderCourseFilter = ({ item }: { item: CourseType }) => (
@@ -144,7 +199,6 @@ const HomeScreen: React.FC = () => {
           onChangeText={setSearchTerm}
         />
 
-        {/* Course Filter List */}
         <FlatList
           data={COURSES}
           renderItem={renderCourseFilter}
@@ -155,7 +209,6 @@ const HomeScreen: React.FC = () => {
           contentContainerStyle={styles.courseListContent}
         />
 
-        {/* --- Average Prices Section --- */}
         <View style={styles.averageContainer}>
           <Text style={styles.averageTitle}>Average Prices by Course</Text>
           <View style={styles.averageRow}>
@@ -171,7 +224,6 @@ const HomeScreen: React.FC = () => {
             <Text style={styles.averageValue}>R{calculateAveragePrice('Dessert')}</Text>
           </View>
         </View>
-        {/* --- End Average Prices Section --- */}
 
         <FlatList
           data={filteredItems}
@@ -187,7 +239,7 @@ const HomeScreen: React.FC = () => {
           <TouchableOpacity
             style={styles.filterButton}
             onPress={() => navigation.navigate('Filter', { 
-                currentFilters: currentFilters || { isVegetarian: false, isVegan: false, priceRange: 500 } as FiltersType,
+                currentFilters: currentFilters || { isVegetarian: false, isVegan: false, priceRange: 500 },
                 currentCourse: selectedCourse 
             })}
           >
@@ -262,6 +314,26 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginRight: 5,
   },
+  actionButtons: {
+    flexDirection: 'row',
+    marginTop: 8,
+    justifyContent: 'flex-start',
+    gap: 10,
+  },
+  editButton: {
+    backgroundColor: '#E8D4FF',
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  deleteButton: {
+    backgroundColor: '#FFD4D4',
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  editText: { color: '#8800C7', fontWeight: '600' },
+  deleteText: { color: '#C70000', fontWeight: '600' },
   emptyText: { textAlign: 'center', marginTop: 50, fontSize: 16, color: '#888' },
   buttonContainer: {
     position: 'absolute',
@@ -289,7 +361,6 @@ const styles = StyleSheet.create({
   },
   filterButtonText: { color: '#fff', fontWeight: 'bold' },
 
-  // --- NEW STYLES FOR AVERAGES ---
   averageContainer: {
     backgroundColor: '#f9f5ff',
     borderRadius: 10,

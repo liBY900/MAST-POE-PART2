@@ -1,31 +1,38 @@
 // src/screens/AddItemScreen.tsx
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, SafeAreaView, Switch, TouchableOpacity, Image, } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { 
+  View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, SafeAreaView, 
+  Switch, TouchableOpacity, Image 
+} from 'react-native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList, NewItemType, CourseType } from '../navigation/types.ts';
-
-
-
-const COURSES: CourseType[] = ['Starter', 'Main Course', 'Dessert'];
+import type { RootStackParamList, NewItemType, CourseType, MenuItemType } from '../navigation/types.ts';
 import * as ImagePicker from 'react-native-image-picker';
 
-
+const COURSES: CourseType[] = ['Starter', 'Main Course', 'Dessert'];
 
 type AddItemNavProp = NativeStackNavigationProp<RootStackParamList, 'AddItem'>;
+type AddItemRouteProp = RouteProp<RootStackParamList, 'AddItem'>;
 
 const AddItemScreen: React.FC = () => {
-  const [dishName, setDishName] = useState('');
-  const [description, setDescription] = useState('');
-  const [price, setPrice] = useState('');
-  const [isVegetarian, setIsVegetarian] = useState(false);
-  const [isVegan, setIsVegan] = useState(false);
- 
-  const [selectedCourse, setSelectedCourse] = useState<CourseType>(COURSES[0]);
-  
-  const [imageUri, setImageUri] = useState<string | undefined>(undefined);
-
   const navigation = useNavigation<AddItemNavProp>();
+  const route = useRoute<AddItemRouteProp>();
+
+  const editItem = route.params?.editItem as MenuItemType | undefined;
+
+  const [dishName, setDishName] = useState(editItem?.name || '');
+  const [description, setDescription] = useState(editItem?.description || '');
+  const [price, setPrice] = useState(editItem?.price?.replace('R', '') || '');
+  const [isVegetarian, setIsVegetarian] = useState(editItem?.vegetarian || false);
+  const [isVegan, setIsVegan] = useState(editItem?.vegan || false);
+  const [selectedCourse, setSelectedCourse] = useState<CourseType>(
+    editItem?.course || COURSES[0]
+  );
+  const [imageUri, setImageUri] = useState<string | undefined>(
+    typeof editItem?.image === 'number' ? undefined : editItem?.image?.uri || editItem?.image?.name
+  );
+
+  const isEditing = !!editItem;
 
   // --- Image Picker Function ---
   const handleChoosePhoto = () => {
@@ -51,7 +58,6 @@ const AddItemScreen: React.FC = () => {
   // -----------------------------
 
   const handleSave = () => {
-    // Input Validation
     if (dishName.trim() === '' || description.trim() === '' || price.trim() === '') {
       Alert.alert('Missing Info', 'Please fill in the name, description, and price.');
       return;
@@ -62,35 +68,38 @@ const AddItemScreen: React.FC = () => {
       return;
     }
 
-    // Validating price is a number
     const numericPrice = parseInt(price, 10);
     if (isNaN(numericPrice) || numericPrice <= 0) {
       Alert.alert('Invalid Price', 'Price must be a valid number greater than zero.');
       return;
     }
 
-    
-    const newItem: NewItemType = {
+    const formattedItem: NewItemType | MenuItemType = {
+      id: editItem?.id || Date.now().toString(),
       name: dishName.trim(),
       description: description.trim(),
-      price: price.trim(), 
+      price: `R${price.trim()}`,
       vegetarian: isVegetarian,
       vegan: isVegan,
       course: selectedCourse,
       imageUri: imageUri,
+      image: editItem?.image, // Keep the existing image if not changed
     };
 
-    // Navigating back to Home and pass the new item via route params
-    navigation.navigate('Home', { newItem });
+    if (isEditing) {
+      navigation.navigate('Home', { editedItem: formattedItem });
+    } else {
+      navigation.navigate('Home', { newItem: formattedItem });
+    }
 
-    // Reset fields
+    // Reset fields after save
     setDishName('');
     setDescription('');
     setPrice('');
     setIsVegetarian(false);
     setIsVegan(false);
-    setSelectedCourse(COURSES[0]); // Reset course
-    setImageUri(undefined); // Reset image
+    setSelectedCourse(COURSES[0]);
+    setImageUri(undefined);
   };
 
   return (
@@ -132,7 +141,6 @@ const AddItemScreen: React.FC = () => {
         </ScrollView>
         <View style={styles.spacerSmall} />
         {/* ----------------------------- */}
-
 
         <Text style={styles.label}>Dish Name</Text>
         <TextInput
@@ -178,14 +186,14 @@ const AddItemScreen: React.FC = () => {
             onValueChange={setIsVegan}
             trackColor={{ false: '#767577', true: '#00C788' }}
             thumbColor={isVegan ? '#fff' : '#f4f3f4'}
-            disabled={!isVegetarian} // A vegan dish must also be vegetarian
+            disabled={!isVegetarian}
           />
         </View>
 
         <View style={styles.spacer} />
 
         <Button
-          title="Save Menu Item"
+          title={isEditing ? "Save Changes" : "Save Menu Item"}
           onPress={handleSave}
           color="#8800C7"
         />
@@ -208,7 +216,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     fontSize: 16
   },
-  descriptionInput: { minHeight: 100, },
+  descriptionInput: { minHeight: 100 },
   switchRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -220,8 +228,6 @@ const styles = StyleSheet.create({
   },
   spacer: { height: 30 },
   spacerSmall: { height: 10 },
-
-  // --- NEW STYLES FOR IMAGE PICKER ---
   imagePicker: {
     borderWidth: 1,
     borderColor: '#8800C7',
@@ -233,23 +239,9 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     backgroundColor: '#f9f5ff',
   },
-  imagePickerText: {
-    color: '#8800C7',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  imagePreview: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 8,
-    resizeMode: 'cover',
-  },
-
-  // --- NEW STYLES FOR COURSE SELECTION ---
-  courseScroll: {
-    marginBottom: 15,
-    maxHeight: 50
-  },
+  imagePickerText: { color: '#8800C7', fontSize: 16, fontWeight: '600' },
+  imagePreview: { width: '100%', height: '100%', borderRadius: 8, resizeMode: 'cover' },
+  courseScroll: { marginBottom: 15, maxHeight: 50 },
   courseButton: {
     paddingHorizontal: 15,
     paddingVertical: 8,
@@ -259,18 +251,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#eee',
   },
-  courseButtonActive: {
-    backgroundColor: '#8800C7',
-    borderColor: '#8800C7',
-  },
-  courseButtonText: {
-    color: '#333',
-    fontWeight: '600',
-    fontSize: 14,
-  },
-  courseButtonTextActive: {
-    color: '#fff',
-  },
+  courseButtonActive: { backgroundColor: '#8800C7', borderColor: '#8800C7' },
+  courseButtonText: { color: '#333', fontWeight: '600', fontSize: 14 },
+  courseButtonTextActive: { color: '#fff' },
 });
 
 export default AddItemScreen;
