@@ -26,4 +26,16 @@ Finalize: Once all details are entered, tap the noticeable 'Save Menu Item' butt
 # What l added for the last part
 
 ## 1.	Course-Specific Average Price Display added to the Home Screen.	
-Provides the chef with a quick, data-driven financial overview by showing the average price for Starters,    Main Courses, and Desserts.
+Provides the chef with a quick, data-driven financial overview by showing the average price for Starters, Main Courses and Desserts.
+
+## 2.	Dedicated Menu Management Screen implemented.	
+Separates the public view (Home Screen) from the editing interface, improving security and focus for the chef. This screen is the central hub for adding and removing items.
+
+## 3.	Menu Item Removal Functionality added to the Menu Management Screen.	
+Allows the chef to permanently delete items from the menu array, ensuring the active menu remains accurate and up-to-date.
+
+## 4.	Guest-Facing Course Filter Screen introduced.	
+Provides guests with a dedicated filter page to quickly narrow the menu by Course (e.g., viewing only Starters), enhancing menu browsing speed.
+
+## 5.	Data Persistence using an Array implemented for all menu items.	
+Ensures that all menu additions are reliably stored and managed in a central data structure, supporting the add/remove functions.
