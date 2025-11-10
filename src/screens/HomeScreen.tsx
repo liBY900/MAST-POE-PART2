@@ -11,15 +11,17 @@ export const COURSES: CourseType[] = ['Starter', 'Main Course', 'Dessert'];
 
 type HomeRouteProp = RouteProp<RootStackParamList, 'Home'>;
 type HomeNavProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
-
 const initialMenuItems: MenuItemType[] = [
   { id: '1', name: 'Grilled Salmon', description: 'With lemon and herbs', price: 'R250', image: require('../../assets/salmon.jpeg'), vegetarian: false, vegan: false, course: 'Main Course' },
   { id: '2', name: 'Mushroom Risotto', description: 'Creamy risotto with wild mushrooms', price: 'R180', image: require('../../assets/risotto.jpeg'), vegetarian: true, vegan: true, course: 'Main Course' },
   { id: '3', name: 'Chocolate Lava Cake', description: 'Warm cake with a molten center', price: 'R95', image: require('../../assets/lava-cake.jpeg'), vegetarian: true, vegan: false, course: 'Dessert' },
   { id: '4', name: 'Lobster and Pasta', description: 'Fresh Atlantic lobster with linguine in a rich butter-garlic sauce', price: 'R450', image: require('../../assets/lobster-pasta.jpeg'), vegetarian: false, vegan: false, course: 'Main Course' },
   { id: '5', name: 'Coconut Rice Bowls', description: 'Fluffy coconut rice topped with pan-seared tofu and fresh vegetables', price: 'R160', image: require('../../assets/Coconut Rice Bowls.jpeg'), vegetarian: true, vegan: true, course: 'Starter' },
-  { id: '6', name: 'Veg Pizza', description: 'Classic stone-baked pizza topped with fresh seasonal vegetables and mozzarella.', price: 'R250', image: require('../../assets/Veg Pizza.jpeg'), vegetarian: true, vegan: false, course: 'Main Course' }
+  { id: '6', name: 'Veg Pizza', description: 'Classic stone-baked pizza topped with fresh seasonal vegetables and mozzarella.', price: 'R250', image: require('../../assets/Veg Pizza.jpeg'), vegetarian: true, vegan: false, course: 'Main Course' },
+  { id: '7', name: 'Caprese Salad', description: 'Fresh mozzarella, tomatoes, and basil drizzled with balsamic glaze', price: 'R120', image: require('../../assets/CapreseSalad.jpeg'), vegetarian: true, vegan: false, course: 'Starter' },
+  { id: '8', name: 'Vanilla Panna Cotta', description: 'Creamy vanilla custard served with a berry coulis', price: 'R110', image: require('../../assets/VanillaPannaCotta.jpeg'), vegetarian: true, vegan: false, course: 'Dessert' }
 ];
+
 
 const HomeScreen: React.FC = () => {
   const navigation = useNavigation<HomeNavProp>();
