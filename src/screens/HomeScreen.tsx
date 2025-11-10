@@ -24,6 +24,7 @@ const initialMenuItems: MenuItemType[] = [
 const HomeScreen: React.FC = () => {
   const navigation = useNavigation<HomeNavProp>();
   const route = useRoute<HomeRouteProp>();
+  
 
   const [menuItems, setMenuItems] = useState<MenuItemType[]>(initialMenuItems);
   const [filteredItems, setFilteredItems] = useState<MenuItemType[]>(initialMenuItems);
