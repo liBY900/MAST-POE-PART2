@@ -24,7 +24,7 @@ const initialMenuItems: MenuItemType[] = [
 const HomeScreen: React.FC = () => {
   const navigation = useNavigation<HomeNavProp>();
   const route = useRoute<HomeRouteProp>();
-  
+
 
   const [menuItems, setMenuItems] = useState<MenuItemType[]>(initialMenuItems);
   const [filteredItems, setFilteredItems] = useState<MenuItemType[]>(initialMenuItems);
@@ -169,10 +169,10 @@ const HomeScreen: React.FC = () => {
 
         <View style={styles.actionButtons}>
           <TouchableOpacity style={styles.editButton} onPress={() => handleEdit(item)}>
-            <Text style={styles.editText}>✏️ Edit</Text>
+            <Text style={styles.editText}> Edit</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete(item.id)}>
-            <Text style={styles.deleteText}>🗑️ Delete</Text>
+            <Text style={styles.deleteText}> Delete</Text>
           </TouchableOpacity>
         </View>
       </View>
