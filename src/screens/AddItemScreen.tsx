@@ -1,8 +1,7 @@
-// src/screens/AddItemScreen.tsx
 import React, { useState, useEffect } from 'react';
-import { 
-  View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, SafeAreaView, 
-  Switch, TouchableOpacity, Image 
+import {
+  View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, SafeAreaView,
+  Switch, TouchableOpacity, Image
 } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';

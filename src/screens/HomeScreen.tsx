@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, Text, FlatList, StyleSheet, Image, TouchableOpacity, 
-  TextInput, SafeAreaView, Alert 
+import {
+  View, Text, FlatList, StyleSheet, Image, TouchableOpacity,
+  TextInput, SafeAreaView, Alert
 } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'; 
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList, MenuItemType, FiltersType, CourseType } from '../navigation/types';
 
 export const COURSES: CourseType[] = ['Starter', 'Main Course', 'Dessert'];
@@ -42,7 +42,7 @@ const HomeScreen: React.FC = () => {
   useEffect(() => {
     if (route.params?.newItem) {
       const newImageSource = route.params.newItem.imageUri
-        ? { uri: route.params.newItem.imageUri } as any 
+        ? { uri: route.params.newItem.imageUri } as any
         : require('../../assets/placeholder.jpeg');
 
       const newItem: MenuItemType = {
@@ -80,11 +80,11 @@ const HomeScreen: React.FC = () => {
 
     let filters = route.params?.filters || currentFilters;
     if (route.params?.filters !== undefined) {
-      setCurrentFilters(route.params.filters || null); 
-      filters = route.params.filters; 
+      setCurrentFilters(route.params.filters || null);
+      filters = route.params.filters;
       navigation.setParams({ filters: undefined });
-    } 
-    
+    }
+
     if (route.params?.selectedCourse !== undefined) {
       setSelectedCourse(route.params.selectedCourse);
       navigation.setParams({ selectedCourse: undefined });
@@ -106,12 +106,12 @@ const HomeScreen: React.FC = () => {
 
     setFilteredItems(items);
   }, [
-    route.params?.filters, 
+    route.params?.filters,
     route.params?.selectedCourse,
-    menuItems, 
-    searchTerm, 
+    menuItems,
+    searchTerm,
     selectedCourse,
-    currentFilters, 
+    currentFilters,
     navigation
   ]);
 
@@ -125,9 +125,10 @@ const HomeScreen: React.FC = () => {
       'Are you sure you want to delete this menu item?',
       [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Delete', style: 'destructive', onPress: () => {
+        {
+          text: 'Delete', style: 'destructive', onPress: () => {
             setMenuItems(prev => prev.filter(item => item.id !== id));
-          } 
+          }
         },
       ]
     );
@@ -139,9 +140,9 @@ const HomeScreen: React.FC = () => {
 
   // ✅ Only ONE renderItem function now (tap-to-edit included)
   const renderItem = ({ item }: { item: MenuItemType }) => (
-    <TouchableOpacity 
-      onPress={() => handleEdit(item)} 
-      activeOpacity={0.9} 
+    <TouchableOpacity
+      onPress={() => handleEdit(item)}
+      activeOpacity={0.9}
       style={styles.menuItem}
     >
       {item.image && (
@@ -233,15 +234,15 @@ const HomeScreen: React.FC = () => {
           ListEmptyComponent={() => (
             <Text style={styles.emptyText}>No items found matching your criteria.</Text>
           )}
-          style={{ flex: 1 }} 
+          style={{ flex: 1 }}
         />
 
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={styles.filterButton}
-            onPress={() => navigation.navigate('Filter', { 
-                currentFilters: currentFilters || { isVegetarian: false, isVegan: false, priceRange: 500 },
-                currentCourse: selectedCourse 
+            onPress={() => navigation.navigate('Filter', {
+              currentFilters: currentFilters || { isVegetarian: false, isVegan: false, priceRange: 500 },
+              currentCourse: selectedCourse
             })}
           >
             <Text style={styles.filterButtonText}>Filter</Text>

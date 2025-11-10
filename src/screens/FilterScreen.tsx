@@ -15,18 +15,18 @@ type FilterRouteProp = RouteProp<RootStackParamList, 'Filter'>;
 const FilterScreen: React.FC = () => {
   const navigation = useNavigation<FilterNavProp>();
   const route = useRoute<FilterRouteProp>();
-  
+
   // Getting initial dietary/price filters
   const initialFilters = route.params?.currentFilters || { isVegetarian: false, isVegan: false, priceRange: 500 };
-  
+
   // Getting initial course filter state from HomeScreen
   const initialCourse = route.params?.currentCourse || null;
 
   const [isVegetarian, setIsVegetarian] = useState(initialFilters.isVegetarian);
   const [isVegan, setIsVegan] = useState(initialFilters.isVegan);
   const [priceRange, setPriceRange] = useState(initialFilters.priceRange);
-  const [selectedCourse, setSelectedCourse] = useState<CourseType | null>(initialCourse); 
-  
+  const [selectedCourse, setSelectedCourse] = useState<CourseType | null>(initialCourse);
+
   const toggleCourseFilter = (course: CourseType) => {
     setSelectedCourse(prev => (prev === course ? null : course));
   };
@@ -38,9 +38,9 @@ const FilterScreen: React.FC = () => {
       isVegan,
       priceRange,
     };
-selectedCourse
+    selectedCourse
     // Navigating back to Home and pass BOTH the filters object AND the 
-    navigation.navigate('Home', { filters, selectedCourse }); 
+    navigation.navigate('Home', { filters, selectedCourse });
   };
 
   const handleClearFilters = () => {
@@ -51,27 +51,27 @@ selectedCourse
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container}>
-        
+
         {/* --- Course Filters --- */}
         <Text style={styles.header}>Course Type</Text>
         <View style={styles.courseContainer}>
-            {COURSES.map(course => (
-                <TouchableOpacity
-                    key={course}
-                    style={[
-                        styles.courseButton,
-                        selectedCourse === course && styles.courseButtonActive
-                    ]}
-                    onPress={() => toggleCourseFilter(course)}
-                >
-                    <Text style={[
-                        styles.courseButtonText,
-                        selectedCourse === course && styles.courseButtonTextActive
-                    ]}>
-                        {course}
-                    </Text>
-                </TouchableOpacity>
-            ))}
+          {COURSES.map(course => (
+            <TouchableOpacity
+              key={course}
+              style={[
+                styles.courseButton,
+                selectedCourse === course && styles.courseButtonActive
+              ]}
+              onPress={() => toggleCourseFilter(course)}
+            >
+              <Text style={[
+                styles.courseButtonText,
+                selectedCourse === course && styles.courseButtonTextActive
+              ]}>
+                {course}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </View>
 
         {/* Dietary Filters */}
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#fff' },
   container: { flex: 1, padding: 20 },
   header: { fontSize: 20, fontWeight: 'bold', color: '#333', marginTop: 15, marginBottom: 15, borderBottomWidth: 1, borderBottomColor: '#eee', paddingBottom: 5 },
-  
+
   // STYLES FOR COURSE FILTER
   courseContainer: {
     flexDirection: 'row',
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
   courseButtonTextActive: {
     color: '#fff',
   },
-  
+
   filterOption: {
     flexDirection: 'row',
     justifyContent: 'space-between',
