@@ -22,3 +22,8 @@ Select Course: Choose the appropriate Course button (Starter, Main Course, or De
 Data Entry: Fill in the clear, labeled fields for the Dish Name, Description, and Price (using numerical entry).
 Dietary Tags: Use the switches to tag the dish as Vegetarian or Vegan (note: the Vegan switch is only active if Vegetarian is enabled).
 Finalize: Once all details are entered, tap the noticeable 'Save Menu Item' button to add the dish to your menu. You'll be automatically returned to the Home Screen.
+
+# What l added for the last part
+
+## 1.	Course-Specific Average Price Display added to the Home Screen.	
+Provides the chef with a quick, data-driven financial overview by showing the average price for Starters,    Main Courses, and Desserts.
